@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:aop="http://www.springframework.org/schema/aop" xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
+
+	<util:properties id="dbConfig" location="classpath:properties/db-properties.xml" />
+	<bean id="dataSourceParent" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="#{dbConfig.driver}"/><!-- <property name="connectionInitSqls" value="SET time_zone='UTC'"></property> -->
+	</bean>
+
+<bean id="dataSource_test" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" parent="dataSourceParent">
+        <property name="url" value="#{dbConfig.url_test}"/><property name="username" value="#{dbConfig.username_test}"/><property name="password" value="#{dbConfig.password_test}"/>
+    </bean>
+<bean id="dataSource_test2" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" parent="dataSourceParent">
+	<property name="url" value="#{dbConfig.url_test2}"/><property name="username" value="#{dbConfig.username_test2}"/><property name="password" value="#{dbConfig.password_test2}"/>
+    </bean>
+
+    <bean id="dataSource" class="com.dataSource.temp.TempRoutingDataSource">
+		<property name="targetDataSources">
+			<map key-type="com.dataSource.temp.TempType">
+				<entry key="TEST" value-ref="dataSource_test" />
+				<entry key="TEST2" value-ref="dataSource_test2" />
+			</map>
+		</property><property name="defaultTargetDataSource" ref="dataSource_test"></property>
+	</bean>
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:com/api/dao/conf/sqlmap-config.xml" />
+		<property name="mapperLocations" value="classpath*:com/api/dao/temp/*.xml" />
+	</bean>
+    <bean id="mapperScanner" class="org.mybatis.spring.mapper.MapperScannerConfigurer"> 
+        <property name="basePackage" value="com.*.dao.temp" /> 
+        <property name="annotationClass" value="org.springframework.stereotype.Repository" /> 
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+    </bean>
+</beans>
+
+============================================================================================================
+
+public class TempContextHolder {
+
+	private static final ThreadLocal<TempType> contextHolder = new ThreadLocal<>();
+	
+	public static void setTempType(TempType TempType) {
+		contextHolder.set(TempType);
+	}
+	
+	public static TempType getTempType() {
+		return (TempType)contextHolder.get();
+	}
+	
+	public static void clearTempType() {
+		contextHolder.remove();
+	}
+	
+}
+
+============================================================================================================
+
+public class TempRoutingDataSource extends AbstractRoutingDataSource {
+
+	@Override
+	protected Object determineCurrentLookupKey() {
+		return TempContextHolder.getTempType();
+	}
+	
+}
+
+============================================================================================================
+
+public enum TempType {
+
+	TEST, TEST2;
+	
+}
+
+============================================================================================================
+
+
+
+
+
+
+
