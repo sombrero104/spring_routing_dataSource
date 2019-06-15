@@ -22,7 +22,8 @@
 				<entry key="TEST" value-ref="dataSource_test" />
 				<entry key="TEST2" value-ref="dataSource_test2" />
 			</map>
-		</property><property name="defaultTargetDataSource" ref="dataSource_test"></property>
+		</property>
+		<property name="defaultTargetDataSource" ref="dataSource_test"></property>
 	</bean>
 	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="dataSource" />
