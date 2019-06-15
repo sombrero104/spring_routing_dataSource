@@ -9,14 +9,14 @@
 		<property name="driverClassName" value="#{dbConfig.driver}"/><!-- <property name="connectionInitSqls" value="SET time_zone='UTC'"></property> -->
 	</bean>
 
-<bean id="dataSource_test" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" parent="dataSourceParent">
-        <property name="url" value="#{dbConfig.url_test}"/><property name="username" value="#{dbConfig.username_test}"/><property name="password" value="#{dbConfig.password_test}"/>
-    </bean>
-<bean id="dataSource_test2" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" parent="dataSourceParent">
-	<property name="url" value="#{dbConfig.url_test2}"/><property name="username" value="#{dbConfig.username_test2}"/><property name="password" value="#{dbConfig.password_test2}"/>
-    </bean>
+	<bean id="dataSource_test" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" parent="dataSourceParent">
+		<property name="url" value="#{dbConfig.url_test}"/><property name="username" value="#{dbConfig.username_test}"/><property name="password" value="#{dbConfig.password_test}"/>
+	</bean>
+	<bean id="dataSource_test2" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" parent="dataSourceParent">
+		<property name="url" value="#{dbConfig.url_test2}"/><property name="username" value="#{dbConfig.username_test2}"/><property name="password" value="#{dbConfig.password_test2}"/>
+	</bean>
 
-    <bean id="dataSource" class="com.dataSource.temp.TempRoutingDataSource">
+	<bean id="dataSource" class="com.dataSource.temp.TempRoutingDataSource">
 		<property name="targetDataSources">
 			<map key-type="com.dataSource.temp.TempType">
 				<entry key="TEST" value-ref="dataSource_test" />
@@ -24,7 +24,7 @@
 			</map>
 		</property><property name="defaultTargetDataSource" ref="dataSource_test"></property>
 	</bean>
-    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
@@ -32,11 +32,11 @@
 		<property name="configLocation" value="classpath:com/api/dao/conf/sqlmap-config.xml" />
 		<property name="mapperLocations" value="classpath*:com/api/dao/temp/*.xml" />
 	</bean>
-    <bean id="mapperScanner" class="org.mybatis.spring.mapper.MapperScannerConfigurer"> 
-        <property name="basePackage" value="com.*.dao.temp" /> 
-        <property name="annotationClass" value="org.springframework.stereotype.Repository" /> 
-        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
-    </bean>
+	<bean id="mapperScanner" class="org.mybatis.spring.mapper.MapperScannerConfigurer"> 
+		<property name="basePackage" value="com.*.dao.temp" /> 
+		<property name="annotationClass" value="org.springframework.stereotype.Repository" /> 
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+	</bean>
 </beans>
 
 ============================================================================================================
